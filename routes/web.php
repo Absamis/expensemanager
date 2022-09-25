@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\ExpenseAdminController;
 use App\Http\Controllers\ExpenseController;
 use Illuminate\Support\Facades\Route;
 
@@ -27,3 +28,11 @@ Route::get('/filter', [ExpenseController::class, "filter"]);
 Route::get('/edit/{expid}', [ExpenseController::class, "edit"]);
 Route::put('/edit/{expid}', [ExpenseController::class, "update"]);
 Route::delete('/edit/{expid}', [ExpenseController::class, "delete"]);
+
+Route::post('/import', [ExpenseController::class, "import"]);
+
+
+//Admin
+Route::get('/admin/dashboard', [ExpenseAdminController::class, "index"]);
+Route::put('/admin/expense/{expid}/{action}', [ExpenseAdminController::class, "approve"]);
+Route::get('/admin/view/{expid}', [ExpenseAdminController::class, "view"]);

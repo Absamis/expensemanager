@@ -3,10 +3,13 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\AddExpenseRequest;
+use App\Http\Requests\ImportExpenseRequest;
 use App\Http\Requests\UpdateExpenseRequest;
 use App\Models\User;
 use App\Services\ExpenseService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class ExpenseController extends Controller
 {
@@ -71,5 +74,14 @@ class ExpenseController extends Controller
         $data = $request->all();
         $response = $this->expenseService->filterExpense($data);
         return view("emp-dashboard", ["expenses" => $response["data"], "filterdata" => $data, "action" => "home", "reimfee" => $response["fee"]]);
+    }
+
+    public function import(ImportExpenseRequest $request)
+    {
+        $fileUrl = Storage::putFile("public", $request->file('file'), "private");
+        $sheet = IOFactory::load(Storage::get($fileUrl));
+        $data = array(1, $sheet->getActiveSheet()
+            ->toArray(null, true, true, true));
+        return $data;
     }
 }

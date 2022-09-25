@@ -21,10 +21,10 @@
                 <h5 class="text-white font-weight-bold">EXPENSE MANAGER</h5>
             </div>
             <div class="tab ml-auto">
-                <button type="button" class="btn bg-outline text-white">
+                <a href="/" class="btn bg-outline text-white">
                     <i class="fa fa-power-off"></i>
                     Logout
-                </button>
+                </a>
             </div>
         </nav>
     </header>

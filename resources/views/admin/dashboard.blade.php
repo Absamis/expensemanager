@@ -11,16 +11,16 @@
             Reimbursement Fee:
             <span class="" style="font-size: 20px;font-weight: 600;">${{ $reimfee }}</span>
         </div>
+        <div class="mx-auto">
+            Amount imbursed:
+            <span class="" style="font-size: 20px;font-weight: 600;">${{ $refee }}</span>
+        </div>
         <div class="ml-auto">
             @if (session('success'))
                 <div class="alert alert-success">{{ session('success') }}</div>
             @elseif (session('error'))
                 <div class="alert alert-danger">{{ session('error') }}</div>
             @endif
-            <h6 class="">
-                <i class="fa fa-user"></i>
-                {{ ucwords(session('name')) }}
-            </h6>
         </div>
     </nav>
     <div class="m-0">
@@ -35,7 +35,7 @@
                             @elseif (session('edit-error'))
                                 <div class="alert alert-danger">{{ session('edit-error') }}</div>
                             @endif
-                            <a href="/dashboard" class="btn ml-auto" data-dismiss="modal">
+                            <a href="/admin/dashboard" class="btn ml-auto" data-dismiss="modal">
                                 <i class="fa fa-times"></i>
                             </a>
                         </div>
@@ -94,24 +94,10 @@
                                         @enderror
                                     </div>
                                     {{-- <div class="form-group">
-                                        <label for="receipt" class="btn form-label">Upload Receipt
-                                            <input type="file" id="receipt" value="{{ old('receipt') }}" hidden
-                                                name="receipt" class="form-control" />
-                                        </label>
-                                        @error('receipt')
-                                            <p class="text-danger">{{ $message }}</p>
-                                        @enderror
-                                    </div>
-                                    <div class="">
-                                        <img hidden id="img" class="w-100" />
+                                        <button type="submit" class="btn bg-color">
+                                            Update
+                                        </button>
                                     </div> --}}
-                                    @if ($expdata->status == 'pending')
-                                        <div class="form-group">
-                                            <button type="submit" class="btn bg-color">
-                                                Update
-                                            </button>
-                                        </div>
-                                    @endif
 
                                 </div>
                                 <div class="col-md-5">
@@ -143,7 +129,7 @@
                 <div class="border-bottom d-flex align-items-center">
                     <p class="p-2">Filter</p>
                     <p class="mx-auto">
-                        <a href="/dashboard">clear filter</a>
+                        <a href="/admin/dashboard">clear filter</a>
                     </p>
                     <span class="btn ml-auto" onclick="closeFilter()">
                         <i class="fa fa-times"></i>
@@ -187,7 +173,7 @@
                         </select>
                     </div>
                     <div class="form-group">
-                        <button type="submit" class="btn bg-color">
+                        <button type="submt" class="btn bg-color">
                             Filter
                         </button>
                     </div>
@@ -219,16 +205,26 @@
                                     @endif
                                 </li>
                                 <li class="tbl-item">
-                                    <a href="/edit/{{ $value->exp_id }}" class="text-info p-1">
+                                    <a href="/admin/view/{{ $value->exp_id }}" class="text-info p-1">
                                         <i class="fa fa-edit fa-lg"></i>
                                     </a>
                                     @if ($value->status == 'pending')
-                                        <form class="d-inline" action="/edit/{{ $value->exp_id }}" method="POST"
-                                            onsubmit="return confirm('Are you sure to delete this expense')">
-                                            @method('DELETE')
+                                        <form class="d-inline" action="/admin/expense/{{ $value->exp_id }}/approve"
+                                            method="POST"
+                                            onsubmit="return confirm('Are you sure to approve this expense')">
+                                            @method('PUT')
+                                            @csrf
+                                            <button type="submit" class="border-0 text-success p-1">
+                                                <i class="fa fa-check fa-lg"></i>
+                                            </button>
+                                        </form>
+                                        <form class="d-inline" action="/admin/expense/{{ $value->exp_id }}/reject"
+                                            method="POST"
+                                            onsubmit="return confirm('Are you sure to decline this expense')">
+                                            @method('PUT')
                                             @csrf
                                             <button type="submit" class="border-0 text-danger p-1">
-                                                <i class="fa fa-trash fa-lg"></i>
+                                                <i class="fa fa-times fa-lg"></i>
                                             </button>
                                         </form>
                                     @endif
@@ -242,85 +238,11 @@
         <section class="add-expense">
             <div class="p-2">
                 <div class="border-bottom d-flex align-items-center">
-                    <p class="p-">Add Expense</p>
-                    <form class="ml-auto" action="/import" method="POST" enctype="multipart/form-data">
-                        @csrf
-                        <label for="import" class="btn">
-                            <input type="file" name="file" id="import" hidden />
-                            Import
-                        </label>
-                        <button type="submit" class="btn">
-                            <i class="fa fa-upload"></i>
-                        </button>
-                        @error('file')
-                            <p class="text-danger">{{ $message }}</p>
-                        @enderror
-                    </form>
+                    <p class="p-">Export Expense</p>
+                    <a href="#" class="btn ml-auto btn-outline-dark">
+                        Export
+                    </a>
                 </div>
-                <form class="mt-3" action="/add-expense" method="POST" enctype="multipart/form-data">
-                    @csrf
-                    <div class="form-group">
-                        <label for="from" class="form-label">Merchant</label>
-                        <select class="form-control" name="merchant">
-                            <option value="">--Select--</option>
-                            <option value="hotel" @if (old('merchant') == 'hotel') selected @endif>Hotel</option>
-                            <option value="restaurant"@if (old('merchant') == 'restaurant') selected @endif>Restaurant
-                            </option>
-                            <option value="hospital"@if (old('merchant') == 'hospital') selected @endif>Hospital
-                            </option>
-                            <option value="rental car"@if (old('merchant') == 'rental car') selected @endif>Rental Car
-                            </option>
-                            <option value="electronics"@if (old('merchant') == 'electronics') selected @endif>Electronics
-                            </option>
-                            <option value="airline"@if (old('merchant') == 'airline') selected @endif>Airline</option>
-                        </select>
-                        @error('merchant')
-                            <p class="text-danger">{{ $message }}</p>
-                        @enderror
-
-                    </div>
-                    <div class="form-group ">
-                        <label for="from" class="form-label">Amount</label>
-                        <input type="number" value="{{ old('amount') }}" min="1" name="amount"
-                            max="1000000000" class="form-control" />
-                        @error('amount')
-                            <p class="text-danger">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div class="form-group">
-                        <label for="from" class="form-label">Date</label>
-                        <input type="date" value="{{ old('date') }}" name="date" class="form-control" />
-                        @error('date')
-                            <p class="text-danger">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div class="form-group">
-                        <label for="from" class="form-label">Remark</label>
-                        <textarea class="form-control" name="remark" maxlength="1500" rows="4">{{ old('remark') }}</textarea>
-                        @error('remark')
-                            <p class="text-danger">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    <div class="form-group">
-                        <label for="receipt" class="btn form-label">Upload Receipt
-                            <input type="file" id="receipt" value="{{ old('receipt') }}" hidden name="receipt"
-                                class="form-control" />
-                        </label>
-                        @error('receipt')
-                            <p class="text-danger">{{ $message }}</p>
-                        @enderror
-                    </div>
-                    @if ($action == 'home')
-                        <div class="">
-                            <img hidden id="img" class="w-100" />
-                        </div>
-                    @endif
-                    <div class="form-group">
-                        <button type="submit" class="btn bg-color">
-                            Submit
-                        </button>
-                    </div>
-                </form>
             </div>
         </section>
     </div>
